@@ -709,24 +709,6 @@ class FocalTransformerBlock(nn.Layer):
         # nW*B, window_size*window_size, C
         attn_windows = self.attn(x_windows_all, mask_all=x_window_masks_all)
         attn_windows = attn_windows[:, :self.window_size ** 2]
-
-        # merge windows
-        # attn_windows = attn_windows.reshape((-1, self.window_size, self.window_size, C))
-        # shifted_x = window_reverse(attn_windows, self.window_size, H, W)  # B H' W' C
-
-        # reverse cyclic shift
-        # if self.shift_size > 0:
-        #     x = paddle.roll(shifted_x, shifts=(self.shift_size, self.shift_size), axis=(1, 2))
-        # else:
-        #     x = shifted_x
-        # x = x[:, :self.input_resolution[0], :self.input_resolution[1]].reshape((B, -1, C))
-
-
-        # FFN
-        # x = shortcut + self.drop_path(x if (not self.use_layerscale) else (self.gamma_1 * x))
-        # x = x + self.drop_path(
-        # self.mlp(self.norm2(x)) if (not self.use_layerscale) else (self.gamma_2 * \
-        # self.mlp(self.norm2(x))))
         
         x = self.merge_windows_and_ffn(attn_windows, shortcut, B, C, H, W)
 
